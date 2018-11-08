@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"crypto/tls"
-	"encoding/base64"
 	"errors"
 	"io"
 	"net/http"
@@ -21,7 +20,6 @@ import (
 )
 
 const (
-	headerKeyAuthorization                = "Authorization"
 	headerKeyContentType                  = "Content-Type"
 	headerValContentTypeJSON              = "application/json"
 	headerValContentTypeBinaryOctetStream = "binary/octet-stream"
@@ -95,13 +93,14 @@ type Client interface {
 }
 
 type client struct {
-	http *http.Client
-	host string
-	auth string
-	user string
-	grup string
-	volp string
-	apiv uint8
+	http            *http.Client
+	hostname        string
+	username        string
+	groupname       string
+	password        string
+	volumePath      string
+	apiVersion      uint8
+	apiMinorVersion uint8
 }
 
 type apiVerResponse struct {
@@ -137,26 +136,26 @@ type ClientOptions struct {
 // New returns a new API client.
 func New(
 	ctx context.Context,
-	host, user, pass, group string,
+	hostname, username, password, groupname string,
 	opts *ClientOptions) (Client, error) {
 
-	if host == "" || user == "" || pass == "" {
+	if hostname == "" || username == "" || password == "" {
 		return nil, errNewClient
 	}
 
 	c := &client{
-		host: host,
-		user: user,
-		grup: group,
-		auth: fmtAuthHeaderVal(user, pass),
-		volp: defaultVolumesPath,
+		hostname:   hostname,
+		username:   username,
+		groupname:  groupname,
+		password:   password,
+		volumePath: defaultVolumesPath,
 	}
 
 	c.http = &http.Client{}
 
 	if opts != nil {
 		if opts.VolumesPath != "" {
-			c.volp = opts.VolumesPath
+			c.volumePath = opts.VolumesPath
 		}
 
 		if opts.Timeout != 0 {
@@ -179,55 +178,27 @@ func New(
 	}
 
 	if resp.Latest != nil {
-		i, err := strconv.ParseUint(*resp.Latest, 10, 8)
+		s := *resp.Latest
+		c.apiMinorVersion = 0
+		if i := strings.Index(s, "."); i != -1 {
+			ms := s[i+1:]
+			m, err := strconv.ParseUint(ms, 10, 8)
+			if err != nil {
+				return nil, err
+			}
+			c.apiMinorVersion = uint8(m)
+			s = s[:i]
+		}
+		i, err := strconv.ParseUint(s, 10, 8)
 		if err != nil {
 			return nil, err
 		}
-		c.apiv = uint8(i)
+		c.apiVersion = uint8(i)
 	} else {
-		c.apiv = 2
+		c.apiVersion = 2
 	}
 
 	return c, nil
-}
-
-func fmtAuthHeaderVal(user, pass string) string {
-
-	var (
-		dbuf []byte
-		vbuf []byte
-		lusr = len(user)
-		lpas = len(pass)
-		sbuf = make([]byte, lusr+lpas+1)
-	)
-
-	for x := 0; x < lusr; x++ {
-		sbuf[x] = user[x]
-	}
-
-	sbuf[lusr] = ':'
-
-	for x := 0; x < lpas; x++ {
-		sbuf[lusr+1+x] = pass[x]
-	}
-
-	dbuf = make([]byte, base64.StdEncoding.EncodedLen(len(sbuf)))
-	base64.StdEncoding.Encode(dbuf, sbuf)
-
-	vbuf = make([]byte, 6+len(dbuf))
-
-	vbuf[0] = 'B'
-	vbuf[1] = 'a'
-	vbuf[2] = 's'
-	vbuf[3] = 'i'
-	vbuf[4] = 'c'
-	vbuf[5] = ' '
-
-	for x := 6; x < len(vbuf); x++ {
-		vbuf[x] = dbuf[x-6]
-	}
-
-	return string(vbuf)
 }
 
 func (c *client) Get(
@@ -330,20 +301,20 @@ func (c *client) DoAndGetResponseBody(
 	body interface{}) (*http.Response, bool, error) {
 
 	var (
-		err                error
-		req                *http.Request
-		res                *http.Response
-		ubf                = &bytes.Buffer{}
-		lid                = len(id)
-		luri               = len(uri)
-		hostEndsWithSlash  = endsWithSlash(c.host)
-		uriBeginsWithSlash = beginsWithSlash(uri)
-		uriEndsWithSlash   = endsWithSlash(uri)
+		err                   error
+		req                   *http.Request
+		res                   *http.Response
+		ubf                   = &bytes.Buffer{}
+		lid                   = len(id)
+		luri                  = len(uri)
+		hostnameEndsWithSlash = endsWithSlash(c.hostname)
+		uriBeginsWithSlash    = beginsWithSlash(uri)
+		uriEndsWithSlash      = endsWithSlash(uri)
 	)
 
-	ubf.WriteString(c.host)
+	ubf.WriteString(c.hostname)
 
-	if !hostEndsWithSlash && (luri > 0 || lid > 0) {
+	if !hostnameEndsWithSlash && (luri > 0 || lid > 0) {
 		ubf.WriteString("/")
 	}
 
@@ -426,7 +397,7 @@ func (c *client) DoAndGetResponseBody(
 	}
 
 	// set the username and password
-	req.Header.Set(headerKeyAuthorization, c.auth)
+	req.SetBasicAuth(c.username, c.password)
 
 	var (
 		isDebugLog bool
@@ -456,23 +427,23 @@ func (c *client) DoAndGetResponseBody(
 }
 
 func (c *client) APIVersion() uint8 {
-	return c.apiv
+	return c.apiVersion
 }
 
 func (c *client) User() string {
-	return c.user
+	return c.username
 }
 
 func (c *client) Group() string {
-	return c.grup
+	return c.groupname
 }
 
 func (c *client) VolumesPath() string {
-	return c.volp
+	return c.volumePath
 }
 
 func (c *client) VolumePath(volumeName string) string {
-	return path.Join(c.volp, volumeName)
+	return path.Join(c.volumePath, volumeName)
 }
 
 func (err *JSONError) Error() string {
