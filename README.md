@@ -7,6 +7,9 @@ well as abstract, helper functionality. In addition, services such as Docker,
 Mesos, and [REX-Ray](http://rexray.readthedocs.io/) use the GoIsilon package
 to integrate with the NAS storage platform.
 
+Since the code team are no longer in existence and this project seems moribund,
+I'm cloning it to apply some fixes. Pull Requests are welcome.
+
 ## OneFS API Support Matrix
 The GoIsilon package is tested with and supports OneFS 7.2+ with support for
 APIv2 and APIv3 (introduced in OneFS 8.0).
@@ -32,11 +35,11 @@ variables to configure the GoIsilon client:
 #### Environment Variables
 Name | Description
 ---- | -----------
-`GOISILON_ENDPOINT` | the API endpoint, ex. `https://172.17.177.230:8080`
-`GOISILON_USERNAME` | the username
-`GOISILON_GROUP` | the user's group
-`GOISILON_PASSWORD` | the password
-`GOISILON_INSECURE` | whether to skip SSL validation
+`GOISILON_ENDPOINT`   | the API endpoint, ex. `https://172.17.177.230:8080`
+`GOISILON_USERNAME`   | the username
+`GOISILON_GROUP`      | the user's group
+`GOISILON_PASSWORD`   | the password
+`GOISILON_INSECURE`   | whether to skip SSL validation
 `GOISILON_VOLUMEPATH` | which base path to use when looking for volume directories
 
 ### Initialize a new client with options
@@ -47,10 +50,10 @@ creating a client:
 client, err := NewClientWithArgs(
 	context.Background(),
 	"https://172.17.177.230:8080",
-	"groupName",
-	"userName",
-	"password",
 	true,
+	"userName",
+	"groupName",
+	"password",
 	"/ifs/volumes")
 if err != nil {
 	panic(err)
@@ -88,7 +91,7 @@ if err := c.DeleteVolume(context.Background(), "loremipsum"); err != nil {
 ### More Examples
 Several, very detailed examples of the GoIsilon package in use can be found in
 the package's `*_test.go` files as well as in the libStorage Isilon
-[storage driver](https://github.com/thecodeteam/rexray/blob/master/libstorage/drivers/storage/isilon/storage/isilon_storage.go).
+[storage driver](https://github.com/rexray/rexray/blob/master/libstorage/drivers/storage/isilon/storage/isilon_storage.go).
 
 ## Contributions
 Please contribute!

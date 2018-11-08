@@ -9,8 +9,8 @@ import (
 
 	log "github.com/akutz/gournal"
 
-	apiv1 "github.com/thecodeteam/goisilon/api/v1"
-	apiv2 "github.com/thecodeteam/goisilon/api/v2"
+	apiv1 "github.com/tenortim/goisilon/api/v1"
+	apiv2 "github.com/tenortim/goisilon/api/v2"
 )
 
 type Volume *apiv1.IsiVolume

@@ -8,7 +8,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/thecodeteam/goisilon/api"
+	"github.com/tenortim/goisilon/api"
 	"context"
 )
 

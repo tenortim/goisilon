@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"path"
 
-	"github.com/thecodeteam/goisilon/api"
+	"github.com/tenortim/goisilon/api"
 )
 
 // GetIsiSnapshots queries a list of all snapshots on the cluster
