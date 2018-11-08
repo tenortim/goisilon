@@ -58,6 +58,9 @@ func TestSetVolumeOwnerToCurrentUser(t *testing.T) {
 	assert.Equal(t, api.PersonaIDTypeUID, acl.Owner.ID.Type)
 
 	err = client.SetVolumeOwner(defaultCtx, volume.Name, "rexray")
+	if err != nil {
+		t.Skipf("Unable to change volume owner: %s - is efs.bam.chown_unrestricted set?", err)
+	}
 	assertNoError(t, err)
 
 	acl, err = client.GetVolumeACL(defaultCtx, volume.Name)
