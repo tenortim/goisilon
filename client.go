@@ -16,6 +16,7 @@ type Client struct {
 	API api.Client
 }
 
+// NewClient returns a new Isilon client struct initialized from the environment.
 func NewClient(ctx context.Context) (*Client, error) {
 	insecure, _ := strconv.ParseBool(os.Getenv("GOISILON_INSECURE"))
 	return NewClientWithArgs(
@@ -28,6 +29,7 @@ func NewClient(ctx context.Context) (*Client, error) {
 		os.Getenv("GOISILON_VOLUMEPATH"))
 }
 
+// NewClientWithArgs returns a new Isilon client struct initialized from the supplied arguments.
 func NewClientWithArgs(
 	ctx context.Context,
 	endpoint string,

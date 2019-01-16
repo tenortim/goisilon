@@ -98,7 +98,7 @@ func TestExportsList(t *testing.T) {
 	volumeBitmap := 0
 	for _, path := range exportMap {
 		if path == volumePath1 {
-			volumeBitmap += 1
+			volumeBitmap++
 		} else if path == volumePath2 {
 			volumeBitmap += 2
 		} else if path == volumePath3 {

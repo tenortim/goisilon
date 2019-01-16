@@ -6,6 +6,7 @@ import (
 	api "github.com/tenortim/goisilon/api/v2"
 )
 
+// ACL is an Isilon Access Control List used for managing an object's security.
 type ACL *api.ACL
 
 // GetVolumeACL returns the ACL for a volume.

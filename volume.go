@@ -13,8 +13,13 @@ import (
 	apiv2 "github.com/tenortim/goisilon/api/v2"
 )
 
+// Volume represents an Isilon Volume (namespace API).
 type Volume *apiv1.IsiVolume
+
+// VolumeChildren is a list of a container's children.
 type VolumeChildren apiv2.ContainerChildList
+
+// VolumeChildrenMap returns a map of all descendent children of a container, where the key is the path.
 type VolumeChildrenMap map[string]*apiv2.ContainerChild
 
 //GetVolume returns a specific volume by name or ID

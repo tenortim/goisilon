@@ -6,8 +6,13 @@ import (
 	api "github.com/tenortim/goisilon/api/v2"
 )
 
+// ExportList is a list of Isilon Exports.
 type ExportList []*api.Export
+
+// Export is an Isilon Export
 type Export *api.Export
+
+// UserMapping maps to the ISI <user-mapping> type.
 type UserMapping *api.UserMapping
 
 // GetExports returns a list of all exports on the cluster
@@ -158,7 +163,7 @@ func (c *Client) DisableRootMapping(
 	return api.ExportUpdate(ctx, c.API, nex)
 }
 
-// DisableRootMappingbyID disables the root mapping for an Export.
+// DisableRootMappingByID disables the root mapping for an Export.
 func (c *Client) DisableRootMappingByID(
 	ctx context.Context, id int) error {
 
@@ -698,7 +703,7 @@ func (c *Client) ClearExportRootClientsByID(
 	return c.SetExportRootClientsByID(ctx, id, []string{}...)
 }
 
-// Stop exporting a given volume from the cluster
+// Unexport stops exporting a given volume from the cluster.
 func (c *Client) Unexport(
 	ctx context.Context, name string) error {
 

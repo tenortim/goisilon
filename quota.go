@@ -6,6 +6,7 @@ import (
 	api "github.com/tenortim/goisilon/api/v1"
 )
 
+// Quota maps to an Isilon filesystem quota.
 type Quota *api.IsiQuota
 
 // GetQuota returns a specific quota by path
@@ -20,7 +21,7 @@ func (c *Client) GetQuota(ctx context.Context, name string) (Quota, error) {
 
 // TODO: Add a means to set/update more fields of the quota
 
-// SetQuota sets the max size (hard threshold) of a quota for a volume
+// SetQuotaSize sets the max size (hard threshold) of a quota for a volume
 func (c *Client) SetQuotaSize(
 	ctx context.Context, name string, size int64) error {
 
@@ -28,7 +29,7 @@ func (c *Client) SetQuotaSize(
 		ctx, c.API, c.API.VolumePath(name), size)
 }
 
-// UpdateQuota modifies the max size (hard threshold) of a quota for a volume
+// UpdateQuotaSize modifies the max size (hard threshold) of a quota for a volume
 func (c *Client) UpdateQuotaSize(
 	ctx context.Context, name string, size int64) error {
 
