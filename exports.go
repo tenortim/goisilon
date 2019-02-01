@@ -63,6 +63,25 @@ func (c *Client) Export(ctx context.Context, name string) (int, error) {
 		&api.Export{Paths: &paths})
 }
 
+// Export the volume with a given name and zone on the cluster
+func (c *Client) ExportWithZone(ctx context.Context, name, zone string) (int, error) {
+
+	ok, id, err := c.IsExported(ctx, name)
+	if err != nil {
+		return 0, err
+	}
+	if ok {
+		return id, nil
+	}
+
+	paths := []string{c.API.VolumePath(name)}
+
+	return api.ExportCreateWithZone(
+		ctx, c.API,
+		&api.Export{Paths: &paths},
+		zone)
+}
+
 // GetRootMapping returns the root mapping for an Export.
 func (c *Client) GetRootMapping(
 	ctx context.Context, name string) (UserMapping, error) {

@@ -196,6 +196,13 @@ func (c *Client) ExportVolume(
 	return c.Export(ctx, name)
 }
 
+//ExportVolumeWithZone exports a volume in the specified access zone
+func (c *Client) ExportVolumeWithZone(
+	ctx context.Context, name, zone string) (int, error) {
+
+	return c.ExportWithZone(ctx, name, zone)
+}
+
 //UnexportVolume stops exporting a volume
 func (c *Client) UnexportVolume(
 	ctx context.Context, name string) error {

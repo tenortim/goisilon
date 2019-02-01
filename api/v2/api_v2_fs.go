@@ -8,8 +8,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/tenortim/goisilon/api"
 	"context"
+	"github.com/tenortim/goisilon/api"
 )
 
 // ContainerChild is a child object of a container.

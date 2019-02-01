@@ -53,12 +53,12 @@ func SetIsiQuotaHardThreshold(
 	//                              }
 	//             }
 	var data = &IsiQuotaReq{
-		Enforced:         true,
-		IncludeSnapshots: false,
-		Path:             path,
+		Enforced:                  true,
+		IncludeSnapshots:          false,
+		Path:                      path,
 		ThresholdsIncludeOverhead: false,
-		Type:       "directory",
-		Thresholds: isiThresholdsReq{Advisory: nil, Hard: size, Soft: nil},
+		Type:                      "directory",
+		Thresholds:                isiThresholdsReq{Advisory: nil, Hard: size, Soft: nil},
 	}
 
 	var quotaResp IsiQuota

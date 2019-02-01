@@ -119,6 +119,38 @@ func ExportCreate(
 	return resp.ID, nil
 }
 
+// ExportCreate POSTs an Export object with zone to the Isilon server.
+func ExportCreateWithZone(
+	ctx context.Context,
+	client api.Client,
+	export *Export, zone string) (int, error) {
+
+	if export.Paths != nil && len(*export.Paths) == 0 {
+		return 0, errors.New("no path set")
+	}
+	if zone == "" {
+		return 0, errors.New("zone cannot be empty")
+	}
+
+	var resp Export
+
+	if err := client.Post(
+		ctx,
+		exportsPath,
+		"",
+		api.OrderedValues{
+			{[]byte("zone"), []byte(zone)},
+		},
+		nil,
+		export,
+		&resp); err != nil {
+
+		return 0, err
+	}
+
+	return resp.ID, nil
+}
+
 // ExportUpdate PUTs an Export object to the Isilon server.
 func ExportUpdate(
 	ctx context.Context,
