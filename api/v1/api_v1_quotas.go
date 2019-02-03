@@ -35,16 +35,17 @@ func GetIsiQuota(
 
 // TODO: Add a means to set/update more than just the hard threshold
 
-// SetIsiQuotaHardThreshold sets the hard threshold of a quota for a directory
-func SetIsiQuotaHardThreshold(
+// CreateIsiQuota creates a hard directory quota on given path
+func CreateIsiQuota(
 	ctx context.Context,
 	client api.Client,
-	path string, size int64) (err error) {
+	path string, container bool, size int64) (err error) {
 
 	// PAPI call: POST https://1.2.3.4:8080/platform/1/quota/quotas
 	//             { "enforced" : true,
 	//               "include_snapshots" : false,
 	//               "path" : "/ifs/volumes/volume_name",
+	//               "container" : true,
 	//               "thresholds_include_overhead" : false,
 	//               "type" : "directory",
 	//               "thresholds" : { "advisory" : null,
@@ -56,6 +57,7 @@ func SetIsiQuotaHardThreshold(
 		Enforced:                  true,
 		IncludeSnapshots:          false,
 		Path:                      path,
+		Container:                 container,
 		ThresholdsIncludeOverhead: false,
 		Type:                      "directory",
 		Thresholds:                isiThresholdsReq{Advisory: nil, Hard: size, Soft: nil},
@@ -64,6 +66,16 @@ func SetIsiQuotaHardThreshold(
 	var quotaResp IsiQuota
 	err = client.Post(ctx, quotaPath, "", nil, nil, data, &quotaResp)
 	return err
+}
+
+// SetIsiQuotaHardThreshold sets the hard threshold of a quota for a directory
+// This is really just CreateIsiQuota() with container set to false
+func SetIsiQuotaHardThreshold(
+	ctx context.Context,
+	client api.Client,
+	path string, size int64) (err error) {
+
+	return CreateIsiQuota(ctx, client, path, false, size)
 }
 
 // UpdateIsiQuotaHardThreshold modifies the hard threshold of a quota for a directory

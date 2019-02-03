@@ -143,6 +143,7 @@ type IsiQuotaReq struct {
 	Thresholds                isiThresholdsReq `json:"thresholds"`
 	ThresholdsIncludeOverhead bool             `json:"thresholds_include_overhead"`
 	Type                      string           `json:"type"`
+	Container                 bool             `json:"container"`
 }
 
 type IsiUpdateQuotaReq struct {

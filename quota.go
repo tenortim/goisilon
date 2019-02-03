@@ -21,6 +21,16 @@ func (c *Client) GetQuota(ctx context.Context, name string) (Quota, error) {
 
 // TODO: Add a means to set/update more fields of the quota
 
+// CreateQuota creates a new hard directory quota with the specified size
+// and container option
+func (c *Client) CreateQuota(
+	ctx context.Context, name string, container bool, size int64) error {
+
+	return api.CreateIsiQuota(
+		ctx, c.API, c.API.VolumePath(name), container, size)
+}
+
+
 // SetQuotaSize sets the max size (hard threshold) of a quota for a volume
 func (c *Client) SetQuotaSize(
 	ctx context.Context, name string, size int64) error {

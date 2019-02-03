@@ -198,6 +198,10 @@ func New(
 		c.apiVersion = 2
 	}
 
+	if c.apiVersion < 3 {
+		return nil, errors.New("OneFS releases older than 8.0 are no longer supported")
+	}
+
 	return c, nil
 }
 

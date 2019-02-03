@@ -63,7 +63,7 @@ func (c *Client) Export(ctx context.Context, name string) (int, error) {
 		&api.Export{Paths: &paths})
 }
 
-// Export the volume with a given name and zone on the cluster
+// ExportWithZone exports the volume with a given name and zone on the cluster
 func (c *Client) ExportWithZone(ctx context.Context, name, zone string) (int, error) {
 
 	ok, id, err := c.IsExported(ctx, name)
