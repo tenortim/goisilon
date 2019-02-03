@@ -45,6 +45,26 @@ func (c *Client) GetExportByName(
 	return nil, nil
 }
 
+// GetExportByNameWithZone returns the first export with a path for the provided
+// volume name in the given zone.
+func (c *Client) GetExportByNameWithZone(
+	ctx context.Context, name, zone string) (Export, error) {
+
+	exports, err := api.ExportsListWithZone(ctx, c.API, zone)
+	if err != nil {
+		return nil, err
+	}
+	path := c.API.VolumePath(name)
+	for _, ex := range exports {
+		for _, p := range *ex.Paths {
+			if p == path {
+				return ex, nil
+			}
+		}
+	}
+	return nil, nil
+}
+
 // Export the volume with a given name on the cluster
 func (c *Client) Export(ctx context.Context, name string) (int, error) {
 
@@ -66,7 +86,7 @@ func (c *Client) Export(ctx context.Context, name string) (int, error) {
 // ExportWithZone exports the volume with a given name and zone on the cluster
 func (c *Client) ExportWithZone(ctx context.Context, name, zone string) (int, error) {
 
-	ok, id, err := c.IsExported(ctx, name)
+	ok, id, err := c.IsExportedWithZone(ctx, name, zone)
 	if err != nil {
 		return 0, err
 	}
@@ -736,11 +756,32 @@ func (c *Client) Unexport(
 	return c.UnexportByID(ctx, id)
 }
 
+// UnexportWithZone stops exporting a given volume in the given from the cluster.
+func (c *Client) UnexportWithZone(
+	ctx context.Context, name, zone string) error {
+
+	ok, id, err := c.IsExportedWithZone(ctx, name, zone)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return nil
+	}
+	return c.UnexportByIDWithZone(ctx, id, zone)
+}
+
 // UnexportByID unexports an Export by its ID.
 func (c *Client) UnexportByID(
 	ctx context.Context, id int) error {
 
 	return api.Unexport(ctx, c.API, id)
+}
+
+// UnexportByIDWithZone unexports an Export by its ID and zone.
+func (c *Client) UnexportByIDWithZone(
+	ctx context.Context, id int, zone string) error {
+
+	return api.UnexportWithZone(ctx, c.API, id, zone)
 }
 
 // IsExported returns a flag and export ID if the provided volume name is
@@ -749,6 +790,21 @@ func (c *Client) IsExported(
 	ctx context.Context, name string) (bool, int, error) {
 
 	export, err := c.GetExportByName(ctx, name)
+	if err != nil {
+		return false, 0, err
+	}
+	if export == nil {
+		return false, 0, nil
+	}
+	return true, export.ID, nil
+}
+
+// IsExportedWithZone returns a flag and export ID if the provided volume name in the
+// specified zone isalready exported.
+func (c *Client) IsExportedWithZone(
+	ctx context.Context, name, zone string) (bool, int, error) {
+
+	export, err := c.GetExportByNameWithZone(ctx, name, zone)
 	if err != nil {
 		return false, 0, err
 	}

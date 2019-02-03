@@ -66,6 +66,29 @@ func ExportsList(
 	return resp, nil
 }
 
+// ExportListWithZone GETs all exports in the specified zone.
+func ExportsListWithZone(
+	ctx context.Context,
+	client api.Client, zone string) ([]*Export, error) {
+
+	var resp ExportList
+
+	if err := client.Get(
+		ctx,
+		exportsPath,
+		"",
+		api.OrderedValues{
+			{[]byte("zone"), []byte(zone)},
+		},
+		nil,
+		&resp); err != nil {
+
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 // ExportInspect GETs an export.
 func ExportInspect(
 	ctx context.Context,
@@ -182,6 +205,23 @@ func ExportDelete(
 		nil)
 }
 
+// ExportDeleteWithZone DELETEs an Export object in the specified zone on the Isilon server.
+func ExportDeleteWithZone(
+	ctx context.Context,
+	client api.Client,
+	id int, zone string) error {
+
+	return client.Delete(
+		ctx,
+		exportsPath,
+		strconv.Itoa(id),
+		api.OrderedValues{
+			{[]byte("zone"), []byte(zone)},
+		},
+		nil,
+		nil)
+}
+
 // SetExportClients sets an Export's clients property.
 func SetExportClients(
 	ctx context.Context,
@@ -209,4 +249,13 @@ func Unexport(
 	id int) error {
 
 	return ExportDelete(ctx, client, id)
+}
+
+// UnexportWithZone is an alias for ExportDeleteWithZone.
+func UnexportWithZone(
+	ctx context.Context,
+	client api.Client,
+	id int, zone string) error {
+
+	return ExportDeleteWithZone(ctx, client, id, zone)
 }
