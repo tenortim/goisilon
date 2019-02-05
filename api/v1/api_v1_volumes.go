@@ -7,15 +7,13 @@ import (
 	"github.com/tenortim/goisilon/api"
 )
 
+const defaultACL = "public_read_write"
+
 var (
 	aclQS           = api.OrderedValues{{[]byte("acl")}}
 	metadataQS      = api.OrderedValues{{[]byte("metadata")}}
 	recursiveTrueQS = api.OrderedValues{
 		{[]byte("recursive"), []byte("true")},
-	}
-	createVolumeHeaders = map[string]string{
-		"x-isi-ifs-target-type":    "container",
-		"x-isi-ifs-access-control": "public_read_write",
 	}
 )
 
@@ -35,9 +33,18 @@ func CreateIsiVolume(
 	client api.Client,
 	name string) (resp *getIsiVolumesResp, err error) {
 
+	return CreateIsiVolumeWithACL(ctx, client, name, defaultACL)
+}
+
+// CreateIsiVolumeWithACL makes a new volume on the cluster with the specified permissions
+func CreateIsiVolumeWithACL(
+	ctx context.Context,
+	client api.Client,
+	name, ACL string) (resp *getIsiVolumesResp, err error) {
+
 	// PAPI calls: PUT https://1.2.3.4:8080/namespace/path/to/volumes/volume_name
 	//             x-isi-ifs-target-type: container
-	//             x-isi-ifs-access-control: public_read_write
+	//             x-isi-ifs-access-control: ACL
 	//
 	//             PUT https://1.2.3.4:8080/namespace/path/to/volumes/volume_name?acl
 	//             {authoritative: "acl",
@@ -45,6 +52,11 @@ func CreateIsiVolume(
 	//              owner: {name: "username", type: "user"},
 	//              group: {name: "groupname", type: "group"}
 	//             }
+
+	createVolumeHeaders := map[string]string{
+		"x-isi-ifs-target-type":    "container",
+		"x-isi-ifs-access-control": ACL,
+	}
 
 	// create the volume
 	err = client.Put(

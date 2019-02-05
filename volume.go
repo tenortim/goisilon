@@ -22,7 +22,7 @@ type VolumeChildren apiv2.ContainerChildList
 // VolumeChildrenMap returns a map of all descendent children of a container, where the key is the path.
 type VolumeChildrenMap map[string]*apiv2.ContainerChild
 
-//GetVolume returns a specific volume by name or ID
+// GetVolume returns a specific volume by name or ID
 func (c *Client) GetVolume(
 	ctx context.Context, id, name string) (Volume, error) {
 
@@ -37,7 +37,7 @@ func (c *Client) GetVolume(
 	return isiVolume, nil
 }
 
-//GetVolumes returns a list of volumes
+// GetVolumes returns a list of volumes
 func (c *Client) GetVolumes(ctx context.Context) ([]Volume, error) {
 
 	volumes, err := apiv1.GetIsiVolumes(ctx, c.API)
@@ -52,11 +52,24 @@ func (c *Client) GetVolumes(ctx context.Context) ([]Volume, error) {
 	return isiVolumes, nil
 }
 
-//CreateVolume creates a volume
+// CreateVolume creates a volume
 func (c *Client) CreateVolume(
 	ctx context.Context, name string) (Volume, error) {
 
 	_, err := apiv1.CreateIsiVolume(ctx, c.API, name)
+	if err != nil {
+		return nil, err
+	}
+
+	var isiVolume = &apiv1.IsiVolume{Name: name, AttributeMap: nil}
+	return isiVolume, nil
+}
+
+// CreateVolume creates a volume
+func (c *Client) CreateVolumeNoACL(
+	ctx context.Context, name string) (Volume, error) {
+
+	_, err := apiv1.CreateIsiVolumeWithACL(ctx, c.API, name, "0777")
 	if err != nil {
 		return nil, err
 	}

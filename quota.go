@@ -30,7 +30,6 @@ func (c *Client) CreateQuota(
 		ctx, c.API, c.API.VolumePath(name), container, size)
 }
 
-
 // SetQuotaSize sets the max size (hard threshold) of a quota for a volume
 func (c *Client) SetQuotaSize(
 	ctx context.Context, name string, size int64) error {
