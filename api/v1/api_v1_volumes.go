@@ -68,30 +68,35 @@ func CreateIsiVolumeWithACL(
 		nil,
 		&resp)
 
-	if err != nil {
-		return resp, err
-	}
+	// The following code is completely pointless and also counterproductive -
+	// The folder is already owned by client.User() because that is the user
+	// that we authenticated to the API with. It's useless additional work that
+	// also fails if the parent doesn't have an ACL granting us std_write_owner
+	/*
+		if err != nil {
+			return resp, err
+		}
+		var data = &AclRequest{
+			"acl",
+			"update",
+			&Ownership{client.User(), "user"},
+			nil,
+		}
 
-	var data = &AclRequest{
-		"acl",
-		"update",
-		&Ownership{client.User(), "user"},
-		nil,
-	}
+		if group := client.Group(); group != "" {
+			data.Group = &Ownership{group, "group"}
+		}
 
-	if group := client.Group(); group != "" {
-		data.Group = &Ownership{group, "group"}
-	}
-
-	// set the ownership of the volume
-	err = client.Put(
-		ctx,
-		realNamespacePath(client),
-		name,
-		aclQS,
-		nil,
-		data,
-		&resp)
+		// set the ownership of the volume
+		err = client.Put(
+			ctx,
+			realNamespacePath(client),
+			name,
+			aclQS,
+			nil,
+			data,
+			&resp)
+	*/
 
 	return resp, err
 }
