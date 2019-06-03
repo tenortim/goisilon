@@ -23,6 +23,7 @@ const (
 	headerKeyContentType                  = "Content-Type"
 	headerValContentTypeJSON              = "application/json"
 	headerValContentTypeBinaryOctetStream = "binary/octet-stream"
+	headerKeyContentLength                = "Content-Length"
 	defaultVolumesPath                    = "/ifs/volumes"
 )
 
@@ -364,6 +365,10 @@ func (c *client) DoAndGetResponseBody(
 					headerKeyContentType, headerValContentTypeBinaryOctetStream)
 			}
 			isContentTypeSet = true
+			// Avoid chunked encoding
+			if _, ok := headers[headerKeyContentLength]; ok {
+				req.TransferEncoding = []string{"native"}
+			}
 		} else {
 			buf := &bytes.Buffer{}
 			enc := json.NewEncoder(buf)
