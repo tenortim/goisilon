@@ -49,3 +49,21 @@ func (c *Client) SetVolumeOwner(
 			Mode: &mode,
 		})
 }
+
+// SetVolumeMode sets the permissions to the specified mode (chmod)
+func (c *Client) SetVolumeMode(
+	ctx context.Context,
+	volumeName string, mode int) error {
+
+	filemode := api.FileMode(mode)
+
+	return api.ACLUpdate(
+		ctx,
+		c.API,
+		volumeName,
+		&api.ACL{
+			Action:        &api.PActionTypeReplace,
+			Authoritative: &api.PAuthoritativeTypeMode,
+			Mode:          &filemode,
+		})
+}
